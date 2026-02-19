@@ -1,0 +1,14 @@
+{
+    "name": "medivault-workspace",
+    "version": "1.0.0",
+    "description": "MediVault Healthcare Platform - Monorepo Management",
+    "scripts": {
+        "start:backend": "cd medivault-backend && mvn spring-boot:run",
+        "start:frontend": "cd medi-vault && npm run dev",
+        "dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+        "install:all": "cd medi-vault && npm install"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

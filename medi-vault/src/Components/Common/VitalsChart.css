@@ -1,0 +1,31 @@
+.vc-container {
+    width: 100%;
+    height: 350px;
+    background: var(--bg-card, #fff);
+    padding: 1.25rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+}
+
+.vc-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary, #1e293b);
+    margin-bottom: 1rem;
+}
+
+/* Tooltip customization */
+.recharts-default-tooltip {
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.dark .recharts-default-tooltip {
+    background-color: rgba(30, 41, 59, 0.95) !important;
+    color: #f1f5f9 !important;
+}
