@@ -498,27 +498,35 @@ export default function DoctorDashboard() {
                                                 </div>
                                             </div>
 
-                                            <div className="dd-form-group">
-                                                <label>Reason for Visit *</label>
-                                                <input type="text" placeholder="e.g. Routine check-up, Follow-up, Emergency"
-                                                    value={rxForm.visitReason} onChange={e => setRxForm(f => ({ ...f, visitReason: e.target.value }))} />
-                                            </div>
+                                            <div className="dd-rx-section-card">
+                                                <div className="dd-rx-section-title">
+                                                    <span className="dd-rx-section-num">1</span> Visit &amp; Diagnosis
+                                                </div>
+                                                <div className="dd-form-group">
+                                                    <label>Reason for Visit *</label>
+                                                    <input type="text" placeholder="e.g. Routine check-up, Follow-up, Emergency"
+                                                        value={rxForm.visitReason} onChange={e => setRxForm(f => ({ ...f, visitReason: e.target.value }))} />
+                                                </div>
 
-                                            <div className="dd-form-group">
-                                                <label>Symptoms & Clinical Observations *</label>
-                                                <textarea rows={3} placeholder="Describe patient symptoms, vitals, and clinical observations..."
-                                                    value={rxForm.symptoms} onChange={e => setRxForm(f => ({ ...f, symptoms: e.target.value }))} />
-                                            </div>
+                                                <div className="dd-form-group">
+                                                    <label>Symptoms &amp; Clinical Observations *</label>
+                                                    <textarea rows={3} placeholder="Describe patient symptoms, vitals, and clinical observations..."
+                                                        value={rxForm.symptoms} onChange={e => setRxForm(f => ({ ...f, symptoms: e.target.value }))} />
+                                                </div>
 
-                                            <div className="dd-form-group">
-                                                <label>Diagnosis *</label>
-                                                <input type="text" placeholder="Primary diagnosis"
-                                                    value={rxForm.diagnosis} onChange={e => setRxForm(f => ({ ...f, diagnosis: e.target.value }))} />
+                                                <div className="dd-form-group">
+                                                    <label>Diagnosis *</label>
+                                                    <input type="text" placeholder="Primary diagnosis"
+                                                        value={rxForm.diagnosis} onChange={e => setRxForm(f => ({ ...f, diagnosis: e.target.value }))} />
+                                                </div>
                                             </div>
 
                                             {/* Medications */}
-                                            <div className="dd-form-group">
-                                                <label>Medications</label>
+                                            <div className="dd-rx-section-card">
+                                                <div className="dd-rx-section-title">
+                                                    <span className="dd-rx-section-num">2</span> Medications
+                                                </div>
+                                                <div className="dd-form-group">
                                                 {rxForm.medications.map((med, i) => (
                                                     <div key={i} className="dd-med-row">
                                                         <div className="dd-med-num">{i + 1}</div>
@@ -535,28 +543,34 @@ export default function DoctorDashboard() {
                                                     </div>
                                                 ))}
                                                 <button className="dd-add-med-btn" onClick={addMed}><Plus size={14} /> Add Medication</button>
+                                                </div>
                                             </div>
 
-                                            <div className="dd-form-group">
-                                                <label>Lab Tests Recommended <span className="dd-label-hint">(comma separated)</span></label>
-                                                <input type="text" placeholder="e.g. CBC, Lipid Panel, ECG"
-                                                    value={rxForm.labTests} onChange={e => setRxForm(f => ({ ...f, labTests: e.target.value }))} />
-                                            </div>
+                                            <div className="dd-rx-section-card">
+                                                <div className="dd-rx-section-title">
+                                                    <span className="dd-rx-section-num">3</span> Follow-up &amp; Notes
+                                                </div>
+                                                <div className="dd-form-group">
+                                                    <label>Lab Tests Recommended <span className="dd-label-hint">(comma separated)</span></label>
+                                                    <input type="text" placeholder="e.g. CBC, Lipid Panel, ECG"
+                                                        value={rxForm.labTests} onChange={e => setRxForm(f => ({ ...f, labTests: e.target.value }))} />
+                                                </div>
 
-                                            <div className="dd-form-group">
-                                                <label>Follow-up Date</label>
-                                                <input type="date" value={rxForm.followUp} onChange={e => setRxForm(f => ({ ...f, followUp: e.target.value }))} />
-                                            </div>
+                                                <div className="dd-form-group">
+                                                    <label>Follow-up Date</label>
+                                                    <input type="date" value={rxForm.followUp} onChange={e => setRxForm(f => ({ ...f, followUp: e.target.value }))} />
+                                                </div>
 
-                                            <div className="dd-form-group">
-                                                <label>Doctor's Notes & Advice</label>
-                                                <textarea rows={3} placeholder="Additional advice, lifestyle changes, warnings..."
-                                                    value={rxForm.notes} onChange={e => setRxForm(f => ({ ...f, notes: e.target.value }))} />
+                                                <div className="dd-form-group">
+                                                    <label>Doctor's Notes &amp; Advice</label>
+                                                    <textarea rows={3} placeholder="Additional advice, lifestyle changes, warnings..."
+                                                        value={rxForm.notes} onChange={e => setRxForm(f => ({ ...f, notes: e.target.value }))} />
+                                                </div>
                                             </div>
 
                                             <div className="dd-rx-form-actions">
                                                 <button className="dd-save-rx-btn" onClick={handleSaveRx}>
-                                                    <Save size={16} /> Save & Generate Prescription
+                                                    <Save size={16} /> Save &amp; Generate Prescription
                                                 </button>
                                             </div>
                                         </div>

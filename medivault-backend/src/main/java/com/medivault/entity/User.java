@@ -3,6 +3,7 @@ package com.medivault.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Entity
@@ -46,6 +47,7 @@ public class User {
         PATIENT, DOCTOR, ADMIN
     }
 
+    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Patient patientProfile;
 }

@@ -7,7 +7,7 @@ import {
     LayoutDashboard, FileText, QrCode, Pill, User, LogOut,
     Bell, ChevronRight, Clock, Shield, Heart, Activity,
     Download, Eye, X, Calendar, AlertTriangle, Phone,
-    Droplets, MapPin, CheckCircle, Upload, Plus, Check, Loader2,
+    Droplets, MapPin, CheckCircle, Upload, Plus, Check, Loader2, FileUp, Printer,
 } from 'lucide-react';
 import { useToast } from '../../Context/ToastContext';
 import Skeleton from '../../Components/Common/Skeleton';
@@ -98,11 +98,27 @@ export default function PatientDashboard() {
 
     const handleLogout = () => { logout(); navigate('/', { replace: true }); };
 
+    // Vitals state
+    const [vitals, setVitals] = useState([]);
+    const handleAddVital = (entry) => {
+        setVitals(prev => [...prev, entry]);
+    };
+
     // Upload modal state
     const [showUpload, setShowUpload] = useState(false);
     const [uploadForm, setUploadForm] = useState({ name: '', type: 'Lab Report', fileUrl: '' });
     const [uploading, setUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [dragOver, setDragOver] = useState(false);
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setDragOver(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) {
+            setUploadForm(f => ({ ...f, name: f.name || file.name.replace(/\.[^.]+$/, ''), fileUrl: '' }));
+        }
+    };
 
     const handleUpload = async (e) => {
         e.preventDefault();
@@ -131,6 +147,27 @@ export default function PatientDashboard() {
         } finally {
             setUploading(false);
         }
+    };
+
+    const handleDownloadQR = () => {
+        const svg = document.querySelector('.pd-qr-box svg');
+        if (!svg) return;
+        const serializer = new XMLSerializer();
+        const svgStr = serializer.serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        canvas.width = 260; canvas.height = 260;
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = () => {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, 260, 260);
+            ctx.drawImage(img, 30, 30, 200, 200);
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/png');
+            a.download = `MediVault-QR-${patient.name || 'patient'}.png`;
+            a.click();
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
     };
 
     const handleDownload = (doc) => {
@@ -269,7 +306,7 @@ export default function PatientDashboard() {
 
                             {/* Health Trends Chart */}
                             <div className="mb-6">
-                                {loading ? <Skeleton height="300px" className="rounded-xl" /> : <VitalsChart />}
+                                {loading ? <Skeleton height="380px" className="rounded-xl" /> : <VitalsChart vitalsData={vitals} onAddVital={handleAddVital} />}
                             </div>
 
                             {/* Active prescriptions preview */}
@@ -374,6 +411,14 @@ export default function PatientDashboard() {
                                         <div className="pd-qr-footer">
                                             <Shield size={11} /> 256-bit encrypted · Valid for this session only
                                         </div>
+                                        <div className="pd-qr-actions">
+                                            <button className="pd-qr-download-btn" onClick={handleDownloadQR}>
+                                                <Download size={14} /> Download QR
+                                            </button>
+                                            <button className="pd-qr-print-btn" onClick={() => window.print()}>
+                                                <Printer size={14} /> Print
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -450,6 +495,17 @@ export default function PatientDashboard() {
                                             <button onClick={() => setShowUpload(false)}><X size={16} /></button>
                                         </div>
                                         <form onSubmit={handleUpload} className="pd-modal-form">
+                                            {/* Drag-drop zone */}
+                                            <div
+                                                className={`pd-drop-zone ${dragOver ? 'drag-over' : ''}`}
+                                                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                                                onDragLeave={() => setDragOver(false)}
+                                                onDrop={handleDrop}
+                                            >
+                                                <FileUp size={24} color="#00d4ff" />
+                                                <p>Drag &amp; drop a file here</p>
+                                                <span>or fill in the details below</span>
+                                            </div>
                                             <label>Document Name *</label>
                                             <input required placeholder="e.g. Blood Test Report" value={uploadForm.name}
                                                 onChange={e => setUploadForm(f => ({ ...f, name: e.target.value }))} />

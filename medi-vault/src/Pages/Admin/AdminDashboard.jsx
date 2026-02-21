@@ -50,6 +50,7 @@ export default function AdminDashboard() {
     const [settings, setSettings] = useState(INITIAL_SETTINGS);
     const [deletingId, setDeletingId] = useState(null);
     const [statsLoading, setStatsLoading] = useState(false);
+    const [deleteModal, setDeleteModal] = useState({ show: false, uid: null, uname: '' });
 
     // Data State
     const [users, setUsers] = useState([]);
@@ -93,7 +94,12 @@ export default function AdminDashboard() {
     const handleLogout = () => { logout(); navigate('/', { replace: true }); };
 
     const handleDeleteUser = async (uid, uname) => {
-        if (!window.confirm(`Delete user "${uname}"? This cannot be undone.`)) return;
+        setDeleteModal({ show: true, uid, uname });
+    };
+
+    const confirmDelete = async () => {
+        const { uid, uname } = deleteModal;
+        setDeleteModal({ show: false, uid: null, uname: '' });
         setDeletingId(uid);
         try {
             await fetch(`/api/admin/users/${uid}`, {
@@ -101,7 +107,6 @@ export default function AdminDashboard() {
                 headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('medivault_user'))?.token}` }
             });
             setUsers(prev => prev.filter(u => u.id !== uid));
-            addLog(`User deleted`, uname, 'warning');
             addLog(`User deleted`, uname, 'warning');
             success('User deleted successfully');
         } catch (err) {
@@ -318,6 +323,21 @@ export default function AdminDashboard() {
 
                 </div>
             </main>
+
+            {/* Delete Confirm Modal */}
+            {deleteModal.show && (
+                <div className="ad-modal-overlay" onClick={() => setDeleteModal({ show: false, uid: null, uname: '' })}>
+                    <div className="ad-confirm-modal" onClick={e => e.stopPropagation()}>
+                        <div className="ad-confirm-icon"><Trash2 size={28} color="#ef4444" /></div>
+                        <h3>Delete User?</h3>
+                        <p>Are you sure you want to delete <strong>{deleteModal.uname}</strong>? This action cannot be undone.</p>
+                        <div className="ad-confirm-actions">
+                            <button className="ad-confirm-cancel" onClick={() => setDeleteModal({ show: false, uid: null, uname: '' })}>Cancel</button>
+                            <button className="ad-confirm-delete" onClick={confirmDelete}>Delete User</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

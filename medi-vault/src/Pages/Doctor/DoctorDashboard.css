@@ -1155,6 +1155,40 @@
     box-shadow: 0 8px 25px rgba(109, 40, 217, 0.35);
 }
 
+/* ── Prescription Section Cards ── */
+.dd-rx-section-card {
+    background: var(--bg-primary, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+}
+
+.dd-rx-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary, #1e293b);
+    margin-bottom: 14px;
+    font-family: 'Inter', sans-serif;
+}
+
+.dd-rx-section-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 /* ── Rx preview ── */
 .dd-rx-preview {
     display: flex;

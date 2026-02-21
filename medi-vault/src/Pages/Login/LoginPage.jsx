@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../Context/AuthContext';
-import { Shield, Eye, EyeOff, LogIn, User, Lock, Activity, HeartPulse } from 'lucide-react';
+import { Shield, Eye, EyeOff, LogIn, User, Lock, Activity, HeartPulse, Stethoscope, ShieldCheck, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './LoginPage.css';
 
 const DEMO_ACCOUNTS = [
-    { role: 'Patient', email: 'patient@medivault.com', password: 'patient123', color: '#00d4ff' },
-    { role: 'Doctor', email: 'doctor@medivault.com', password: 'doctor123', color: '#7c3aed' },
-    { role: 'Admin', email: 'admin@medivault.com', password: 'admin123', color: '#059669' },
+    { role: 'Patient', email: 'patient@medivault.com', password: 'patient123', color: '#00d4ff', icon: HeartPulse, desc: 'View records & QR vault' },
+    { role: 'Doctor', email: 'doctor@medivault.com', password: 'doctor123', color: '#7c3aed', icon: Stethoscope, desc: 'Scan QR & prescribe' },
+    { role: 'Admin', email: 'admin@medivault.com', password: 'admin123', color: '#059669', icon: ShieldCheck, desc: 'Manage users & system' },
 ];
 
 export default function LoginPage() {
@@ -19,6 +19,13 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [emailTouched, setEmailTouched] = useState(false);
+    const [passwordTouched, setPasswordTouched] = useState(false);
+
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const passwordValid = password.length >= 6;
+    const emailError = emailTouched && email && !emailValid ? 'Please enter a valid email address' : '';
+    const passwordError = passwordTouched && password && !passwordValid ? 'Password must be at least 6 characters' : '';
 
     useEffect(() => {
         if (isLoggedIn && user?.role) {
@@ -142,19 +149,24 @@ export default function LoginPage() {
 
                     <motion.div className="demo-accounts" variants={itemVariants}>
                         <p className="demo-label">Quick Demo Access:</p>
-                        <div className="demo-chips-grid" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                            {DEMO_ACCOUNTS.map((acc, index) => (
+                        <div className="demo-chips-grid">
+                            {DEMO_ACCOUNTS.map((acc) => (
                                 <motion.button
                                     key={acc.role}
-                                    className="demo-chip"
+                                    className="demo-role-card"
                                     style={{ '--chip-color': acc.color }}
                                     onClick={() => fillDemo(acc)}
                                     type="button"
-                                    whileHover={{ scale: 1.05, translateY: -2 }}
-                                    whileTap={{ scale: 0.95 }}
+                                    whileHover={{ scale: 1.02, translateY: -3 }}
+                                    whileTap={{ scale: 0.97 }}
                                 >
-                                    <span className="demo-dot" style={{ background: acc.color }} />
-                                    {acc.role}
+                                    <div className="demo-role-icon" style={{ background: `${acc.color}18`, color: acc.color }}>
+                                        <acc.icon size={18} />
+                                    </div>
+                                    <div className="demo-role-info">
+                                        <span className="demo-role-label">{acc.role}</span>
+                                        <span className="demo-role-desc">{acc.desc}</span>
+                                    </div>
                                 </motion.button>
                             ))}
                         </div>
@@ -189,29 +201,40 @@ export default function LoginPage() {
                         <form onSubmit={handleSubmit} className="login-form">
                             <div className="form-group">
                                 <label htmlFor="email">Email Address</label>
-                                <div className="input-wrap">
+                                <div className={`input-wrap ${emailError ? 'input-error' : emailTouched && email && emailValid ? 'input-success' : ''}`}>
                                     <User size={18} className="input-icon" />
                                     <input
                                         id="email"
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
+                                        onBlur={() => setEmailTouched(true)}
                                         placeholder="you@example.com"
                                         required
                                         autoComplete="email"
                                     />
+                                    {emailTouched && email && (
+                                        emailValid
+                                            ? <CheckCircle size={16} className="input-status-icon success" />
+                                            : <AlertCircle size={16} className="input-status-icon error" />
+                                    )}
                                 </div>
+                                {emailError && <span className="field-error">{emailError}</span>}
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="password">Password</label>
-                                <div className="input-wrap">
+                                <div className="form-label-row">
+                                    <label htmlFor="password">Password</label>
+                                    <button type="button" className="forgot-link">Forgot password?</button>
+                                </div>
+                                <div className={`input-wrap ${passwordError ? 'input-error' : passwordTouched && password && passwordValid ? 'input-success' : ''}`}>
                                     <Lock size={18} className="input-icon" />
                                     <input
                                         id="password"
                                         type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
+                                        onBlur={() => setPasswordTouched(true)}
                                         placeholder="••••••••"
                                         required
                                         autoComplete="current-password"
@@ -225,6 +248,7 @@ export default function LoginPage() {
                                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
                                 </div>
+                                {passwordError && <span className="field-error">{passwordError}</span>}
                             </div>
 
                             {error && (
@@ -264,6 +288,14 @@ export default function LoginPage() {
                             transition={{ delay: 1 }}
                         >
                             <Shield size={14} /> Secured with 256-bit encryption
+                        </motion.p>
+                        <motion.p
+                            className="login-register-text"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1.2 }}
+                        >
+                            New patient? <span className="register-link">Ask your healthcare provider to register you</span>
                         </motion.p>
                     </motion.div>
                 </motion.div>

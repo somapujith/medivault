@@ -532,9 +532,133 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    margin-top: 2rem;
+    margin-top: 1.25rem;
     color: #94a3b8;
     font-size: 0.8rem;
     font-family: 'Inter', sans-serif;
     font-weight: 500;
+}
+
+.login-register-text {
+    text-align: center;
+    margin-top: 0.75rem;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.register-link {
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ─── Inline Validation ──────────────────────────────────────────────────────── */
+.input-wrap.input-error input {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.input-wrap.input-success input {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.input-status-icon {
+    position: absolute;
+    right: 46px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.input-status-icon.success { color: #10b981; }
+.input-status-icon.error { color: #ef4444; }
+
+.field-error {
+    display: block;
+    color: #ef4444;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 4px;
+    margin-left: 2px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ─── Form label row ─────────────────────────────────────────────────────────── */
+.form-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.forgot-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    padding: 0;
+    transition: opacity 0.2s;
+}
+
+.forgot-link:hover { opacity: 0.75; }
+
+/* ─── Demo Role Cards ────────────────────────────────────────────────────────── */
+.demo-chips-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.demo-role-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    width: 100%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.demo-role-card:hover {
+    border-color: var(--chip-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.demo-role-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.demo-role-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.demo-role-label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+}
+
+.demo-role-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
 }

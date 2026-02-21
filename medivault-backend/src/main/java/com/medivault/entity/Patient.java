@@ -2,6 +2,7 @@ package com.medivault.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ public class Patient {
     @Column(nullable = false, unique = true)
     private String id; // e.g. P001
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
