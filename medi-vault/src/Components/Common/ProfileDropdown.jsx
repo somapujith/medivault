@@ -36,10 +36,10 @@ const ProfileDropdown = ({ user, role }) => {
 
     const getRoleColor = (r) => {
         switch (r?.toLowerCase()) {
-            case 'doctor': return 'linear-gradient(135deg, #6d28d9, #4f46e5)';
-            case 'admin': return 'linear-gradient(135deg, #059669, #047857)';
-            case 'patient': return 'linear-gradient(135deg, #0ea5e9, #0284c7)';
-            default: return 'linear-gradient(135deg, #64748b, #475569)';
+            case 'doctor': return '#1e40af';
+            case 'admin': return '#059669';
+            case 'patient': return '#0d9488';
+            default: return '#64748b';
         }
     };
 

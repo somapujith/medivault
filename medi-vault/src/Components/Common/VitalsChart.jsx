@@ -42,6 +42,7 @@ const VitalsChart = ({ vitalsData, onAddVital }) => {
             heartRate: Number(form.heartRate),
         };
         if (onAddVital) {
+            // eslint-disable-next-line no-unused-vars
             try { await onAddVital(entry); } catch (_) { /* handled by parent */ }
         }
         setSaving(false);
@@ -61,7 +62,7 @@ const VitalsChart = ({ vitalsData, onAddVital }) => {
                         <Plus size={14} /> Log Vitals
                     </button>
                 </div>
-                <div className="flex-1 w-full min-h-0">
+                <div className="vc-chart-wrapper">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color, #e5e7eb)" opacity={0.5} />
@@ -125,7 +126,7 @@ const VitalsChart = ({ vitalsData, onAddVital }) => {
                     <div className="vc-modal" onClick={e => e.stopPropagation()}>
                         <div className="vc-modal-header">
                             <div className="vc-modal-title-row">
-                                <Activity size={18} color="#00d4ff" />
+                                <Activity size={18} style={{ color: 'var(--primary)' }} />
                                 <h3>Log Today's Vitals</h3>
                             </div>
                             <button className="vc-modal-close" onClick={() => setShowModal(false)}>

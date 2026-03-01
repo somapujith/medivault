@@ -25,9 +25,17 @@ export const ToastProvider = ({ children }) => {
         setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, []);
 
-    const success = (message) => showToast(message, 'success');
-    const error = (message) => showToast(message, 'error');
-    const info = (message) => showToast(message, 'info');
+    const success = useCallback((message) => {
+        return showToast(message, 'success');
+    }, [showToast]);
+
+    const error = useCallback((message) => {
+        return showToast(message, 'error');
+    }, [showToast]);
+
+    const info = useCallback((message) => {
+        return showToast(message, 'info');
+    }, [showToast]);
 
     return (
         <ToastContext.Provider value={{ showToast, removeToast, success, error, info }}>

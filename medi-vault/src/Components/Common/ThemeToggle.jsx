@@ -1,6 +1,8 @@
+// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../Context/ThemeContext';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import './ThemeToggle.css';
 
@@ -28,19 +30,15 @@ const ThemeToggle = () => {
                     backgroundColor: isDark ? '#1e293b' : '#ffffff' // Dark handle on dark mode, white on light
                 }}
             >
-                <motion.div
+                <div
                     key={isDark ? "moon" : "sun"}
-                    initial={{ scale: 0.5, opacity: 0, rotate: -180 }}
-                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                    exit={{ scale: 0.5, opacity: 0, rotate: 180 }}
-                    transition={{ duration: 0.2 }}
                 >
                     {isDark ? (
-                        <Moon size={14} color="#a78bfa" fill="#a78bfa" />
+                        <Moon size={14} style={{ color: 'var(--primary-muted)' }} />
                     ) : (
-                        <Sun size={14} color="#f59e0b" fill="#f59e0b" />
+                        <Sun size={14} style={{ color: '#d97706' }} />
                     )}
-                </motion.div>
+                </div>
             </motion.div>
             <div className="theme-toggle-focus-ring" />
         </button>

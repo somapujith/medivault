@@ -6,7 +6,7 @@ import {
     LayoutDashboard, Users, QrCode, FileText, User, LogOut,
     Bell, ChevronRight, Clock, Shield, Scan, CheckCircle,
     Plus, Trash2, X, Pill, AlertTriangle, Activity,
-    Phone, Calendar, Droplets, Save, Printer, ChevronDown,
+    Phone, Calendar, Droplets, Save, Printer,
 } from 'lucide-react';
 import { prescriptionApi } from '../../Api/ApiClient';
 import { useToast } from '../../Context/ToastContext';
@@ -21,6 +21,7 @@ const NAV = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'scanner', label: 'Scan Patient QR', icon: QrCode },
     { id: 'patients', label: 'My Patients', icon: Users },
+    { id: 'appointments', label: 'Appointments', icon: Calendar },
     { id: 'prescriptions', label: 'Prescriptions Issued', icon: FileText },
     { id: 'profile', label: 'My Profile', icon: User },
 ];
@@ -39,7 +40,18 @@ const EMPTY_RX = {
 export default function DoctorDashboard() {
     const { user, logout } = useAuth();
     const { success, error } = useToast();
-    const { getAllPatients, getPrescriptionsByDoctor, addPrescription, startScanSession, clearScanSession, scannedPatient } = useData();
+    const {
+        getAllPatients,
+        getPrescriptionsByDoctor,
+        addPrescription,
+        startScanSession,
+        clearScanSession,
+        scannedPatient,
+        getPrescriptionsForPatient,
+        getAppointmentsForDoctor,
+        addAppointment,
+        updateAppointmentStatus,
+    } = useData();
     const navigate = useNavigate();
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -51,8 +63,11 @@ export default function DoctorDashboard() {
     // Data State
     const [myPatients, setMyPatients] = useState([]);
     const [myPrescriptions, setMyPrescriptions] = useState([]);
+    const [appointments, setAppointments] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { setSearchTerm(''); }, [activeTab]);
 
     const filteredPatients = (Array.isArray(myPatients) ? myPatients : []).filter(p =>
@@ -65,32 +80,38 @@ export default function DoctorDashboard() {
         rx.diagnosis?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const upcomingAppointments = (Array.isArray(appointments) ? appointments : [])
+        .filter(a => a.startTime && new Date(a.startTime) >= new Date())
+        .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
     useEffect(() => {
         let mounted = true;
         const loadData = async () => {
             if (user?.id) {
                 try {
-                    const [pats, rxs] = await Promise.all([
+                    const [pats, rxs, appts] = await Promise.all([
                         getAllPatients(),
-                        getPrescriptionsByDoctor(user.id)
+                        getPrescriptionsByDoctor(user.id),
+                        getAppointmentsForDoctor(user.id),
                     ]);
                     if (mounted) {
                         setMyPatients(pats || []);
                         setMyPrescriptions(rxs || []);
+                        setAppointments(appts || []);
                     }
                 } catch (err) {
                     console.error(err);
+                    error('Unable to load dashboard data. Please try again.');
                 }
             }
         };
         loadData();
         return () => { mounted = false; };
-    }, [user, getAllPatients, getPrescriptionsByDoctor]);
+    }, [user, getAllPatients, getPrescriptionsByDoctor, getAppointmentsForDoctor, error]);
 
     // Scanner state
     const [scanInput, setScanInput] = useState('');
     const [scanError, setScanError] = useState('');
-    const [scanSuccess, setScanSuccess] = useState(false);
 
     // Prescription form
     const [rxForm, setRxForm] = useState(EMPTY_RX);
@@ -98,9 +119,12 @@ export default function DoctorDashboard() {
     const [showPreview, setShowPreview] = useState(false);
     const printRef = useRef();
 
+    // Appointment form
+    const [apptForm, setApptForm] = useState({ patientId: '', startTime: '', reason: '' });
+    const [savingAppt, setSavingAppt] = useState(false);
+
     // Dropdown States
     const [notifOpen, setNotifOpen] = useState(false);
-    const [profileOpen, setProfileOpen] = useState(false);
     const [notifications, setNotifications] = useState([
         { id: 1, text: 'New patient scan from ER', time: '5m ago', read: false },
         { id: 2, text: 'Lab results ready for Patient P003', time: '1h ago', read: false },
@@ -118,7 +142,6 @@ export default function DoctorDashboard() {
         try {
             const found = await startScanSession(patientId);
             if (found) {
-                setScanSuccess(true);
                 setRxForm(EMPTY_RX);
                 setRxSaved(null);
                 setShowPreview(false);
@@ -130,6 +153,7 @@ export default function DoctorDashboard() {
                 setScanError('Patient not found. Invalid QR code.');
             }
         } catch (err) {
+            console.error(err);
             setScanError('Patient not found. Invalid QR code.');
         }
     };
@@ -146,7 +170,6 @@ export default function DoctorDashboard() {
 
     const handleClearScan = () => {
         clearScanSession();
-        setScanSuccess(false);
         setScanInput('');
         setScanError('');
         setRxForm(EMPTY_RX);
@@ -203,16 +226,72 @@ export default function DoctorDashboard() {
         }
     };
 
+    const handleUseHistoryAsTemplate = (rx) => {
+        setRxForm({
+            visitReason: rx.visitReason || '',
+            symptoms: rx.symptoms || '',
+            diagnosis: rx.diagnosis || '',
+            medications: (rx.medications || []).map(m => ({
+                name: m.name || '',
+                dose: m.dose || '',
+                frequency: m.frequency || '',
+                duration: m.duration || '',
+                instructions: m.instructions || '',
+            })),
+            labTests: (rx.labTests || []).join(', '),
+            followUp: rx.followUp || '',
+            notes: rx.notes || '',
+        });
+        setShowPreview(false);
+        success('Loaded previous prescription as template.');
+    };
+
+    const handleCreateAppointment = async (e) => {
+        e.preventDefault();
+        if (!apptForm.patientId || !apptForm.startTime) {
+            error('Select patient and date/time.');
+            return;
+        }
+        setSavingAppt(true);
+        try {
+            await addAppointment({
+                patientId: apptForm.patientId,
+                doctorId: user.id,
+                startTime: apptForm.startTime,
+                reason: apptForm.reason || 'Consultation',
+            });
+            success('Appointment created.');
+            const appts = await getAppointmentsForDoctor(user.id);
+            setAppointments(appts || []);
+            setApptForm({ patientId: '', startTime: '', reason: '' });
+        } catch (err) {
+            error('Failed to create appointment: ' + err.message);
+        } finally {
+            setSavingAppt(false);
+        }
+    };
+
+    const handleUpdateAppointmentStatus = async (id, status) => {
+        try {
+            await updateAppointmentStatus(id, status);
+            const appts = await getAppointmentsForDoctor(user.id);
+            setAppointments(appts || []);
+            success('Appointment updated.');
+        } catch (err) {
+            error('Failed to update appointment: ' + err.message);
+        }
+    };
+
     const handlePrint = () => {
         const content = printRef.current;
         const win = window.open('', '_blank');
         win.document.write(`<html><head><title>Prescription</title>
       <style>
         body{font-family:Arial,sans-serif;padding:24px;color:#111;max-width:800px;margin:auto}
-        .lh{display:flex;justify-content:space-between;border-bottom:2px solid #0099cc;padding-bottom:12px;margin-bottom:16px}
-        .lh-logo{font-size:20px;font-weight:bold;color:#0099cc}
+        .lh{display:flex;justify-content:space-between;border-bottom:2px solid #0d9488;padding-bottom:12px;margin-bottom:16px}
+        .lh-logo{font-size:20px;font-weight:bold;color:#0d9488}
         .lh-right{text-align:right;font-size:12px;color:#444;line-height:1.6}
-        .rx-title{font-size:18px;font-weight:bold;color:#0099cc;margin:12px 0 4px}
+        .rx-title{font-size:18px;font-weight:bold;color:#0d9488;margin:12px 0 4px}
         .ts{font-size:11px;color:#888}
         .pbox{background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;padding:10px 14px;margin:12px 0}
         .pbox p{font-size:13px;margin:3px 0}
@@ -238,7 +317,7 @@ export default function DoctorDashboard() {
             {/* Sidebar */}
             <aside className={`dd-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="dd-sidebar-brand">
-                    <img src="/logo.png" alt="MediVault" style={{ height: '32px', width: 'auto' }} />
+                    <img src="/logo.png" alt="MediVault" loading="lazy" style={{ height: '32px', width: 'auto' }} />
                     <span style={{ marginLeft: '8px' }}>MediVault</span>
                 </div>
                 <div className="dd-sidebar-user">
@@ -327,7 +406,7 @@ export default function DoctorDashboard() {
                         <div className="dd-tab">
                             <div className="dd-welcome">
                                 <div>
-                                    <h2>Good day, {user?.name} 🩺</h2>
+                                    <h2>Good day, {user?.name}</h2>
                                     <p>{user?.specialty} · {user?.hospital || 'MediVault General Hospital'}</p>
                                 </div>
                                 <div className="dd-welcome-date"><Clock size={13} />
@@ -337,10 +416,10 @@ export default function DoctorDashboard() {
 
                             <div className="dd-stats-row">
                                 {[
-                                    { label: 'Total Patients', value: myPatients.length, icon: Users, color: '#7c3aed' },
-                                    { label: 'Prescriptions Issued', value: myPrescriptions.length, icon: FileText, color: '#00d4ff' },
-                                    { label: 'Active Prescriptions', value: myPrescriptions.filter(r => r.status === 'active').length, icon: Pill, color: '#10b981' },
-                                    { label: 'Pending Follow-ups', value: myPrescriptions.filter(r => r.followUp && new Date(r.followUp) > new Date()).length, icon: Calendar, color: '#f59e0b' },
+                                    { label: 'Total Patients', value: myPatients.length, icon: Users, color: '#1e40af' },
+                                    { label: 'Upcoming Appointments', value: upcomingAppointments.length, icon: Calendar, color: '#0d9488' },
+                                    { label: 'Prescriptions Issued', value: myPrescriptions.length, icon: FileText, color: '#0d9488' },
+                                    { label: 'Pending Follow-ups', value: myPrescriptions.filter(r => r.followUp && new Date(r.followUp) > new Date()).length, icon: Pill, color: '#f59e0b' },
                                 ].map(({ label, value, icon: Icon, color }) => (
                                     <div key={label} className="dd-stat-card">
                                         <div className="dd-stat-icon" style={{ color }}><Icon size={20} /></div>
@@ -354,7 +433,7 @@ export default function DoctorDashboard() {
 
                             <div className="dd-section-label">Quick Action</div>
                             <div className="dd-quick-action" onClick={() => setActiveTab('scanner')}>
-                                <div className="dd-qa-icon"><Scan size={28} color="#7c3aed" /></div>
+                                <div className="dd-qa-icon"><Scan size={28} style={{ color: '#1e40af' }} /></div>
                                 <div>
                                     <p className="dd-qa-title">Scan Patient QR Code</p>
                                     <p className="dd-qa-desc">Scan a patient's QR to access their profile and write a prescription</p>
@@ -366,7 +445,7 @@ export default function DoctorDashboard() {
                             <div className="dd-rx-list">
                                 {myPrescriptions.slice(0, 5).map(rx => (
                                     <div key={rx.id} className="dd-rx-card">
-                                        <div className="dd-rx-icon"><FileText size={18} color="#7c3aed" /></div>
+                                        <div className="dd-rx-icon"><FileText size={18} style={{ color: '#1e40af' }} /></div>
                                         <div className="dd-rx-info">
                                             <p className="dd-rx-title">{rx.patientName || 'Patient'} — {rx.diagnosis}</p>
                                             <p className="dd-rx-meta">{new Date(rx.issuedAt).toLocaleString('en-IN')}</p>
@@ -386,7 +465,7 @@ export default function DoctorDashboard() {
                                     <div className="dd-scanner-card">
                                         <div className="dd-scanner-icon-wrap">
                                             <div className="dd-scanner-pulse" />
-                                            <Scan size={40} color="#7c3aed" />
+                                            <Scan size={40} style={{ color: '#1e40af' }} />
                                         </div>
                                         <h2>Scan Patient QR Code</h2>
                                         <p>Use your device camera to scan the patient's MediVault QR code, or select a patient below to simulate a scan.</p>
@@ -398,7 +477,10 @@ export default function DoctorDashboard() {
                                                 className="dd-scan-input"
                                                 placeholder='Paste QR data or Patient ID (e.g. P001)'
                                                 value={scanInput}
-                                                onChange={e => setScanInput(e.target.value)}
+                                                onChange={e => {
+                                                    setScanInput(e.target.value);
+                                                    if (scanError) setScanError('');
+                                                }}
                                                 onKeyDown={e => e.key === 'Enter' && handleManualScan()}
                                             />
                                             <button className="dd-scan-btn" onClick={handleManualScan}>
@@ -418,7 +500,7 @@ export default function DoctorDashboard() {
                                                         <span className="dd-ps-name">{p.name}</span>
                                                         <span className="dd-ps-meta">ID: {p.id} · {p.bloodGroup} · {p.gender}</span>
                                                     </div>
-                                                    <QrCode size={16} color="#7c3aed" />
+                                                    <QrCode size={16} style={{ color: '#1e40af' }} />
                                                 </button>
                                             ))}
                                         </div>
@@ -451,7 +533,7 @@ export default function DoctorDashboard() {
                                         )}
                                         {scannedPatient.chronicConditions?.length > 0 && (
                                             <div className="dd-pp-conditions">
-                                                <Activity size={13} color="#00d4ff" />
+                                                <Activity size={13} style={{ color: '#0d9488' }} />
                                                 <span>Conditions: {scannedPatient.chronicConditions.join(', ')}</span>
                                             </div>
                                         )}
@@ -478,6 +560,14 @@ export default function DoctorDashboard() {
                                                                 <p className="dd-hist-doc">{rx.doctorName} ({rx.doctorSpecialty})</p>
                                                                 <p className="dd-hist-hosp">{rx.doctorHospital}</p>
                                                                 <p className="dd-hist-diag">{rx.diagnosis}</p>
+                                                                <button
+                                                                    type="button"
+                                                                    className="dd-prescribe-btn"
+                                                                    onClick={() => handleUseHistoryAsTemplate(rx)}
+                                                                    style={{ marginTop: '4px' }}
+                                                                >
+                                                                    Use as template
+                                                                </button>
                                                             </div>
                                                         );
                                                     })}
@@ -490,7 +580,7 @@ export default function DoctorDashboard() {
                                     {!showPreview ? (
                                         <div className="dd-rx-form">
                                             <div className="dd-rx-form-header">
-                                                <FileText size={18} color="#7c3aed" />
+                                                <FileText size={18} style={{ color: '#1e40af' }} />
                                                 <h3>Write Prescription</h3>
                                                 <div className="dd-rx-timestamp">
                                                     <Clock size={12} />
@@ -615,6 +705,115 @@ export default function DoctorDashboard() {
                         </div>
                     )}
 
+                    {/* ── APPOINTMENTS ── */}
+                    {activeTab === 'appointments' && (
+                        <div className="dd-tab">
+                            <div className="dd-section-label">Create Appointment</div>
+                            <form className="dd-rx-form" onSubmit={handleCreateAppointment}>
+                                <div className="dd-form-group">
+                                    <label>Patient</label>
+                                    <select
+                                        value={apptForm.patientId}
+                                        onChange={e => setApptForm(f => ({ ...f, patientId: e.target.value }))}
+                                    >
+                                        <option value="">Select patient</option>
+                                        {(Array.isArray(myPatients) ? myPatients : []).map(p => (
+                                            <option key={p.id} value={p.id}>
+                                                {p.name} ({p.id})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="dd-form-group">
+                                    <label>Date &amp; Time</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={apptForm.startTime}
+                                        onChange={e => setApptForm(f => ({ ...f, startTime: e.target.value }))}
+                                    />
+                                </div>
+                                <div className="dd-form-group">
+                                    <label>Reason</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Follow-up for hypertension"
+                                        value={apptForm.reason}
+                                        onChange={e => setApptForm(f => ({ ...f, reason: e.target.value }))}
+                                    />
+                                </div>
+                                <div className="dd-rx-form-actions">
+                                    <button className="dd-save-rx-btn" type="submit" disabled={savingAppt}>
+                                        <Calendar size={16} /> {savingAppt ? 'Saving...' : 'Schedule Appointment'}
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div className="dd-section-label">Upcoming Appointments</div>
+                            <div className="dd-rx-list">
+                                {upcomingAppointments.length === 0 && (
+                                    <EmptyState
+                                        title="No upcoming appointments"
+                                        description="Scheduled visits will appear here."
+                                    />
+                                )}
+                                {upcomingAppointments.map(a => (
+                                    <div key={a.id} className="dd-rx-card">
+                                        <div className="dd-rx-icon">
+                                            <Calendar size={18} style={{ color: '#1e40af' }} />
+                                        </div>
+                                        <div className="dd-rx-info">
+                                            <p className="dd-rx-title">
+                                                {a.patientName || a.patientId} — {a.reason}
+                                            </p>
+                                            <p className="dd-rx-meta">
+                                                {a.startTime && new Date(a.startTime).toLocaleString('en-IN')}
+                                            </p>
+                                        </div>
+                                        <div className="dd-rx-status-wrap">
+                                            <span className="dd-badge active">{a.status}</span>
+                                            {a.status === 'requested' && (
+                                                <>
+                                                    <button
+                                                        className="dd-status-btn"
+                                                        type="button"
+                                                        onClick={() => handleUpdateAppointmentStatus(a.id, 'approved')}
+                                                    >
+                                                        <CheckCircle size={13} /> Approve
+                                                    </button>
+                                                    <button
+                                                        className="dd-status-btn"
+                                                        type="button"
+                                                        onClick={() => handleUpdateAppointmentStatus(a.id, 'cancelled')}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </>
+                                            )}
+                                            {a.status === 'approved' && (
+                                                <>
+                                                    <button
+                                                        className="dd-status-btn"
+                                                        type="button"
+                                                        onClick={() => handleUpdateAppointmentStatus(a.id, 'completed')}
+                                                    >
+                                                        Complete
+                                                    </button>
+                                                    <button
+                                                        className="dd-status-btn"
+                                                        type="button"
+                                                        onClick={() => handleUpdateAppointmentStatus(a.id, 'cancelled')}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* ── PRESCRIPTIONS ── */}
                     {activeTab === 'prescriptions' && (
                         <div className="dd-tab">
@@ -626,7 +825,7 @@ export default function DoctorDashboard() {
                                 {filteredRx.length === 0 && <EmptyState title="No prescriptions found" description="Try a different search term" />}
                                 {filteredRx.map(rx => (
                                     <div key={rx.id} className="dd-rx-card">
-                                        <div className="dd-rx-icon"><FileText size={18} color="#7c3aed" /></div>
+                                        <div className="dd-rx-icon"><FileText size={18} style={{ color: '#1e40af' }} /></div>
                                         <div className="dd-rx-info">
                                             <p className="dd-rx-title">{rx.patientName || rx.patientId} — {rx.diagnosis}</p>
                                             <p className="dd-rx-meta">{new Date(rx.issuedAt).toLocaleString('en-IN')}</p>
@@ -682,6 +881,7 @@ export default function DoctorDashboard() {
 }
 
 // ─── Prescription Preview ─────────────────────────────────────────────────────
+// eslint-disable-next-line no-unused-vars
 function RxPreview({ rx, doctor, patient, printRef, onPrint, onNew }) {
     if (!rx) return null;
     return (
@@ -698,7 +898,7 @@ function RxPreview({ rx, doctor, patient, printRef, onPrint, onNew }) {
                 {/* Letterhead */}
                 <div className="rx-letterhead">
                     <div className="rx-lh-left">
-                        <div className="rx-lh-logo"><img src="/logo.png" alt="MediVault" style={{ height: '36px', width: 'auto', marginRight: '8px' }} /><span>MediVault</span></div>
+                        <div className="rx-lh-logo"><img src="/logo.png" alt="MediVault" loading="lazy" style={{ height: '36px', width: 'auto', marginRight: '8px' }} /><span>MediVault</span></div>
                         <p className="rx-lh-hospital">{rx.doctorHospital}</p>
                     </div>
                     <div className="rx-lh-right">

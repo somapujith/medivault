@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import { patientApi, prescriptionApi, documentApi, adminApi } from '../Api/ApiClient';
+import { patientApi, prescriptionApi, documentApi, adminApi, appointmentApi } from '../Api/ApiClient';
 
 const DataContext = createContext(null);
 
@@ -60,6 +60,23 @@ export function DataProvider({ children }) {
         return await prescriptionApi.create(rxData);
     }, []);
 
+    // ── Appointment helpers ──────────────────────────────────────────────────
+    const getAppointmentsForPatient = useCallback(async (patientId) => {
+        return await appointmentApi.getForPatient(patientId);
+    }, []);
+
+    const getAppointmentsForDoctor = useCallback(async (doctorId) => {
+        return await appointmentApi.getForDoctor(doctorId);
+    }, []);
+
+    const addAppointment = useCallback(async (apptData) => {
+        return await appointmentApi.create(apptData);
+    }, []);
+
+    const updateAppointmentStatus = useCallback(async (id, status) => {
+        return await appointmentApi.updateStatus(id, status);
+    }, []);
+
     // ── Document helpers ─────────────────────────────────────────────────────
     const getDocumentsForPatient = useCallback(async (patientId) => {
         return await documentApi.getForPatient(patientId);
@@ -86,6 +103,10 @@ export function DataProvider({ children }) {
             getPrescriptionsForPatient,
             getPrescriptionsByDoctor,
             addPrescription,
+            getAppointmentsForPatient,
+            getAppointmentsForDoctor,
+            addAppointment,
+            updateAppointmentStatus,
             getDocumentsForPatient,
             addDocument,
             getSystemStats,

@@ -64,6 +64,21 @@ export const prescriptionApi = {
         request('PATCH', `/prescriptions/${id}/status`, { status }, getToken()),
 };
 
+// ── Appointments ──────────────────────────────────────────────────────────────
+export const appointmentApi = {
+    create: (data) =>
+        request('POST', '/appointments', data, getToken()),
+
+    getForPatient: (patientId) =>
+        request('GET', `/appointments/patient/${patientId}`, null, getToken()),
+
+    getForDoctor: (doctorId) =>
+        request('GET', `/appointments/doctor/${doctorId}`, null, getToken()),
+
+    updateStatus: (id, status) =>
+        request('PATCH', `/appointments/${id}/status`, { status }, getToken()),
+};
+
 // ── Documents ─────────────────────────────────────────────────────────────────
 export const documentApi = {
     getForPatient: (patientId) =>

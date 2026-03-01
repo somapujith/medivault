@@ -32,8 +32,8 @@ const INITIAL_SETTINGS = [
     { key: 'autoBackups', label: 'Auto Backups', desc: 'Daily automated database backups at 2 AM', on: true },
 ];
 
-const roleColor = { patient: '#00d4ff', doctor: '#7c3aed', admin: '#059669', PATIENT: '#00d4ff', DOCTOR: '#7c3aed', ADMIN: '#059669' };
-const logColor = { info: '#00d4ff', warning: '#f59e0b', success: '#10b981', error: '#ef4444' };
+const roleColor = { patient: '#0d9488', doctor: '#1e40af', admin: '#059669', PATIENT: '#0d9488', DOCTOR: '#1e40af', ADMIN: '#059669' };
+const logColor = { info: '#0d9488', warning: '#d97706', success: '#059669', error: '#dc2626' };
 
 export default function AdminDashboard() {
     const { user, logout } = useAuth();
@@ -83,11 +83,12 @@ export default function AdminDashboard() {
                 if (sData) setStats(sData);
             } catch (err) {
                 console.error("Admin data load error", err);
+                error('Unable to load admin data. Please try again.');
             } finally {
                 setStatsLoading(false);
             }
         }
-    }, [user, getAllUsers, getSystemStats]);
+    }, [user, getAllUsers, getSystemStats, error]);
 
     useEffect(() => { loadData(); }, [loadData]);
 
@@ -110,6 +111,7 @@ export default function AdminDashboard() {
             addLog(`User deleted`, uname, 'warning');
             success('User deleted successfully');
         } catch (err) {
+            console.error(err);
             error('Failed to delete user.');
         } finally {
             setDeletingId(null);
@@ -136,7 +138,7 @@ export default function AdminDashboard() {
 
             <aside className={`ad-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="ad-sidebar-brand">
-                    <img src="/logo.png" alt="MediVault" style={{ height: '32px', width: 'auto' }} />
+                    <img src="/logo.png" alt="MediVault" loading="lazy" style={{ height: '32px', width: 'auto' }} />
                     <span style={{ marginLeft: '8px' }}>MediVault</span>
                 </div>
                 <div className="ad-sidebar-user">
@@ -182,7 +184,7 @@ export default function AdminDashboard() {
                         <div className="ad-tab">
                             <div className="ad-welcome">
                                 <div>
-                                    <h2>Admin Control Center 🛡️</h2>
+                                    <h2>Admin Control Center</h2>
                                     <p>All systems operational · MediVault v2.0</p>
                                 </div>
                                 <div className="ad-welcome-date"><Clock size={13} />
@@ -192,8 +194,8 @@ export default function AdminDashboard() {
 
                             <div className="ad-stats-row">
                                 {[
-                                    { label: 'Total Users', value: stats.users || users.length, icon: Users, color: '#00d4ff' },
-                                    { label: 'Registered Patients', value: stats.patients || 0, icon: Activity, color: '#7c3aed' },
+                                    { label: 'Total Users', value: stats.users || users.length, icon: Users, color: '#0d9488' },
+                                    { label: 'Registered Patients', value: stats.patients || 0, icon: Activity, color: '#1e40af' },
                                     { label: 'Prescriptions', value: stats.prescriptions || 0, icon: Pill, color: '#10b981' },
                                     { label: 'Documents', value: stats.documents || 0, icon: FileText, color: '#f59e0b' },
                                 ].map(({ label, value, icon: Icon, color }) => (

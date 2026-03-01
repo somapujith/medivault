@@ -7,6 +7,8 @@ import com.medivault.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/documents")
+@SuppressWarnings("null")
 public class DocumentController {
 
     @Autowired
@@ -33,13 +36,24 @@ public class DocumentController {
 
     /**
      * POST /api/documents — Add a document record (metadata only for demo)
+     * Patients can upload their own documents; doctors/admin can upload for any patient.
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('DOCTOR','ADMIN')")
-    public ResponseEntity<?> addDocument(@RequestBody Map<String, String> body) {
+    @PreAuthorize("hasAnyRole('PATIENT','DOCTOR','ADMIN')")
+    public ResponseEntity<?> addDocument(@RequestBody Map<String, String> body,
+                                         @AuthenticationPrincipal UserDetails userDetails) {
         String patientId = body.get("patientId");
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        boolean isPatientRole = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_PATIENT"));
+
+        if (isPatientRole) {
+            if (patient.getUser() == null || !patient.getUser().getEmail().equals(userDetails.getUsername())) {
+                return ResponseEntity.status(403).build();
+            }
+        }
 
         Document doc = Document.builder()
                 .id("DOC" + System.currentTimeMillis())

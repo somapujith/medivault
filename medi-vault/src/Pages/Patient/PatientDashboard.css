@@ -1,12 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
 /* ── Layout ── */
 .pd-layout {
     display: flex;
     min-height: 100vh;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
 }
 
 .pd-overlay {
@@ -90,7 +88,7 @@
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    background: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -135,10 +133,10 @@
 }
 
 .pd-nav-btn.active {
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(2, 132, 199, 0.07));
-    color: #0284c7;
+    background: rgba(13, 148, 136, 0.1);
+    color: var(--primary);
     font-weight: 600;
-    border: 1px solid rgba(14, 165, 233, 0.15);
+    border: 1px solid rgba(13, 148, 136, 0.2);
 }
 
 .pd-nav-arrow {
@@ -164,7 +162,7 @@
 }
 
 .pd-logout-btn:hover {
-    background: #fee2e2;
+    background: rgba(220, 38, 38, 0.12);
 }
 
 /* ── Main ── */
@@ -282,7 +280,7 @@
 
 /* ── Welcome ── */
 .pd-welcome {
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    background: var(--primary);
     border-radius: 18px;
     padding: 1.75rem 2rem;
     display: flex;
@@ -291,7 +289,7 @@
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 8px 30px rgba(14, 165, 233, 0.25);
+    box-shadow: 0 4px 20px rgba(13, 148, 136, 0.2);
 }
 
 .pd-welcome h2 {
@@ -412,7 +410,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: #0284c7;
+    color: var(--primary);
 }
 
 .pd-rx-info {
@@ -468,9 +466,9 @@
 }
 
 .pd-badge.active {
-    background: rgba(2, 132, 199, 0.1);
-    color: #0284c7;
-    border: 1px solid rgba(2, 132, 199, 0.2);
+    background: rgba(13, 148, 136, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(13, 148, 136, 0.2);
 }
 
 .pd-badge.completed {
@@ -527,9 +525,9 @@
 }
 
 .pd-tag.blue {
-    background: #e0f2fe;
-    color: #0284c7;
-    border: 1px solid #bae6fd;
+    background: rgba(13, 148, 136, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(13, 148, 136, 0.25);
 }
 
 .pd-tag-row {
@@ -569,9 +567,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #e0f2fe;
-    border: 1px solid #bae6fd;
-    color: #0284c7;
+    background: rgba(13, 148, 136, 0.1);
+    border: 1px solid rgba(13, 148, 136, 0.2);
+    color: var(--primary);
     padding: 5px 14px;
     border-radius: 100px;
     font-size: 0.72rem;
@@ -610,8 +608,8 @@
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    background: #e0f2fe;
-    color: #0284c7;
+    background: rgba(13, 148, 136, 0.12);
+    color: var(--primary);
     font-size: 0.75rem;
     font-weight: 700;
     display: flex;
@@ -639,7 +637,7 @@
     flex-direction: column;
     align-items: center;
     gap: 1rem;
-    box-shadow: 0 4px 24px rgba(14, 165, 233, 0.1);
+    box-shadow: 0 4px 16px rgba(13, 148, 136, 0.08);
     min-width: 260px;
 }
 
@@ -647,7 +645,7 @@
     display: flex;
     align-items: center;
     gap: 7px;
-    color: #0284c7;
+    color: var(--primary);
     font-size: 0.8rem;
     font-weight: 700;
 }
@@ -686,9 +684,9 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: #e0f2fe;
-    border: 1px solid #bae6fd;
-    color: #0284c7;
+    background: rgba(13, 148, 136, 0.1);
+    border: 1px solid rgba(13, 148, 136, 0.2);
+    color: var(--primary);
     padding: 3px 10px;
     border-radius: 100px;
     font-size: 0.72rem;
@@ -735,7 +733,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: #0284c7;
+    color: var(--primary);
 }
 
 .pd-doc-info {
@@ -785,9 +783,9 @@
 }
 
 .pd-doc-btn:hover {
-    background: rgba(2, 132, 199, 0.1);
-    color: #0284c7;
-    border-color: rgba(2, 132, 199, 0.3);
+    background: rgba(13, 148, 136, 0.1);
+    color: var(--primary);
+    border-color: rgba(13, 148, 136, 0.25);
 }
 
 /* ── Profile ── */
@@ -813,7 +811,7 @@
     width: 70px;
     height: 70px;
     border-radius: 16px;
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    background: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -843,9 +841,9 @@
     font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
-    background: rgba(2, 132, 199, 0.1);
-    color: #0284c7;
-    border: 1px solid rgba(2, 132, 199, 0.15);
+    background: rgba(13, 148, 136, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(13, 148, 136, 0.2);
 }
 
 .pd-profile-grid {
@@ -956,7 +954,7 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    background: var(--primary);
     color: #fff;
     padding: 8px 18px;
     border-radius: 10px;
@@ -970,7 +968,7 @@
 
 .pd-print-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+    box-shadow: 0 4px 16px rgba(13, 148, 136, 0.25);
 }
 
 /* ── Prescription Letter (shared) ── */
@@ -1004,7 +1002,7 @@
     gap: 8px;
     font-size: 1.3rem;
     font-weight: 800;
-    color: #0284c7;
+    color: var(--primary);
 }
 
 .rx-lh-hospital {
@@ -1032,7 +1030,7 @@
 
 .rx-divider {
     height: 2px;
-    background: linear-gradient(90deg, #0284c7, #6d28d9);
+    background: var(--primary);
     border-radius: 2px;
     margin-bottom: 1.25rem;
 }
@@ -1047,7 +1045,7 @@
 .rx-title {
     font-size: 1.2rem;
     font-weight: 800;
-    color: #0284c7;
+    color: var(--primary);
     margin: 0 0 3px;
 }
 
@@ -1090,7 +1088,7 @@
 .rx-field-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #0369a1;
+    color: var(--primary);
     min-width: 120px;
 }
 
@@ -1108,7 +1106,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #0284c7;
+    color: var(--primary);
     border-bottom: 1px solid #e2e8f0;
     padding-bottom: 4px;
     margin-bottom: 0.625rem;
@@ -1154,7 +1152,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #0284c7;
+    background: var(--primary);
     color: #fff;
     font-size: 0.72rem;
     font-weight: 700;
@@ -1175,7 +1173,7 @@
 .rx-med-dose {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #0284c7;
+    color: var(--primary);
     margin-left: 6px;
 }
 
@@ -1198,8 +1196,8 @@
 }
 
 .rx-test-chip {
-    background: #e0f2fe;
-    color: #0369a1;
+    background: rgba(13, 148, 136, 0.12);
+    color: var(--primary);
     padding: 4px 12px;
     border-radius: 100px;
     font-size: 0.78rem;
@@ -1253,8 +1251,8 @@
     align-items: center;
     gap: 5px;
     font-size: 0.72rem;
-    color: #0284c7;
-    background: #e0f2fe;
+    color: var(--primary);
+    background: rgba(13, 148, 136, 0.1);
     padding: 5px 10px;
     border-radius: 6px;
 }
@@ -1279,7 +1277,7 @@
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    background: var(--primary);
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -1375,12 +1373,12 @@
 
 .pd-modal-form input:focus,
 .pd-modal-form select:focus {
-    border-color: #00d4ff;
+    border-color: var(--primary);
     background: var(--bg-card);
 }
 
 .pd-modal-submit {
-    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    background: var(--primary);
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -1414,8 +1412,8 @@
 }
 
 .pd-drop-zone.drag-over {
-    border-color: #00d4ff;
-    background: rgba(0, 212, 255, 0.06);
+    border-color: var(--primary);
+    background: rgba(13, 148, 136, 0.06);
 }
 
 .pd-drop-zone p {
@@ -1452,7 +1450,7 @@
 }
 
 .pd-qr-download-btn {
-    background: linear-gradient(135deg, #00d4ff, #7c3aed);
+    background: var(--primary);
     color: #fff;
     border: none;
 }

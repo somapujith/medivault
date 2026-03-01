@@ -1,12 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
 /* ── Layout ── */
 .dd-layout {
     display: flex;
     min-height: 100vh;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
 }
 
 .dd-overlay {
@@ -91,7 +89,7 @@
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #6d28d9, #4f46e5);
+    background: #1e40af;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -132,10 +130,10 @@
 }
 
 .dd-nav-btn.active {
-    background: linear-gradient(135deg, rgba(109, 40, 217, 0.08), rgba(79, 70, 229, 0.06));
-    color: #8b5cf6;
+    background: rgba(30, 64, 175, 0.1);
+    color: #1e40af;
     font-weight: 600;
-    border: 1px solid rgba(109, 40, 217, 0.12);
+    border: 1px solid rgba(30, 64, 175, 0.2);
 }
 
 .dd-nav-arrow {
@@ -279,7 +277,7 @@
 
 /* ── Welcome ── */
 .dd-welcome {
-    background: linear-gradient(135deg, #6d28d9, #4f46e5);
+    background: #1e40af;
     border-radius: 18px;
     padding: 1.75rem 2rem;
     display: flex;
@@ -387,8 +385,8 @@
 }
 
 .dd-quick-action:hover {
-    box-shadow: 0 6px 20px rgba(109, 40, 217, 0.12);
-    border-color: rgba(109, 40, 217, 0.2);
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+    border-color: rgba(148, 163, 184, 0.7);
     transform: translateY(-2px);
 }
 
@@ -396,7 +394,7 @@
     width: 52px;
     height: 52px;
     border-radius: 14px;
-    background: linear-gradient(135deg, rgba(109, 40, 217, 0.1), rgba(79, 70, 229, 0.08));
+    background: #e0e7ff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -448,7 +446,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: #8b5cf6;
+    color: #1e40af;
 }
 
 .dd-rx-info {
@@ -506,7 +504,7 @@
 
 .dd-badge.active {
     background: rgba(139, 92, 246, 0.1);
-    color: #8b5cf6;
+    color: #1e40af;
     border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
@@ -612,7 +610,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: linear-gradient(135deg, #6d28d9, #4f46e5);
+    background: #1e40af;
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -690,8 +688,8 @@
     width: 36px;
     height: 36px;
     border-radius: 9px;
-    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-    color: #6d28d9;
+    background: #e0e7ff;
+    color: #1e40af;
     font-weight: 700;
     font-size: 0.9rem;
     display: flex;
@@ -753,7 +751,7 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #6d28d9, #4f46e5);
+    background: #1e40af;
     color: #fff;
     font-weight: 700;
     font-size: 1.1rem;
@@ -1112,7 +1110,7 @@
     gap: 6px;
     background: rgba(124, 58, 237, 0.08);
     border: 1px dashed rgba(124, 58, 237, 0.3);
-    color: #7c3aed;
+    color: #1e40af;
     padding: 8px 16px;
     border-radius: 10px;
     font-size: 0.8rem;
@@ -1138,7 +1136,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, #6d28d9, #4f46e5);
+    background: #1e40af;
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -1179,7 +1177,7 @@
     width: 24px;
     height: 24px;
     border-radius: 7px;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    background: #1e40af;
     color: #fff;
     font-size: 0.75rem;
     font-weight: 700;
@@ -1221,7 +1219,7 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: linear-gradient(135deg, #6d28d9, #4f46e5);
+    background: #1e40af;
     color: #fff;
     padding: 8px 18px;
     border-radius: 10px;
@@ -1286,8 +1284,8 @@
     width: 42px;
     height: 42px;
     border-radius: 11px;
-    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-    color: #6d28d9;
+    background: #e0e7ff;
+    color: #1e40af;
     font-weight: 700;
     font-size: 1.05rem;
     display: flex;
@@ -1382,7 +1380,7 @@
     width: 70px;
     height: 70px;
     border-radius: 16px;
-    background: linear-gradient(135deg, #6d28d9, #4f46e5);
+    background: #1e40af;
     display: flex;
     align-items: center;
     justify-content: center;

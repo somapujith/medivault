@@ -1,94 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../Context/AuthContext';
 import { Shield, Activity, Lock, Users, Zap, Heart, QrCode, FileText, Star, ChevronRight, CheckCircle, ArrowRight, Github, Twitter, Linkedin, Menu, X } from 'lucide-react';
 import './LandingPage.css';
 
 const features = [
-    {
-        icon: <Shield size={28} />,
-        title: 'Secure Health Records',
-        desc: 'Military-grade AES-256 encryption keeps your medical data private and protected at all times.',
-        color: '#00d4ff',
-    },
-    {
-        icon: <Activity size={28} />,
-        title: 'Real-Time Monitoring',
-        desc: 'Track vitals, prescriptions, and health metrics with live dashboards and trend charts.',
-        color: '#7c3aed',
-    },
-    {
-        icon: <Lock size={28} />,
-        title: 'Role-Based Access',
-        desc: 'Patients, doctors, and admins each get a tailored, permission-controlled experience.',
-        color: '#059669',
-    },
-    {
-        icon: <QrCode size={28} />,
-        title: 'Instant QR Access',
-        desc: 'Share medical records instantly via secure QR codes in emergencies — zero paperwork.',
-        color: '#dc2626',
-    },
-    {
-        icon: <FileText size={28} />,
-        title: 'Digital Prescriptions',
-        desc: 'Doctors write, sign, and send structured prescriptions digitally. Full audit trail included.',
-        color: '#d97706',
-    },
-    {
-        icon: <Users size={28} />,
-        title: 'Multi-User Platform',
-        desc: 'Seamlessly connect patients with healthcare providers in one unified, HIPAA-ready system.',
-        color: '#ec4899',
-    },
+    { icon: <Shield size={28} />, title: 'Secure Health Records', desc: 'Military-grade AES-256 encryption keeps your medical data private and protected at all times.' },
+    { icon: <Activity size={28} />, title: 'Real-Time Monitoring', desc: 'Track vitals, prescriptions, and health metrics with live dashboards and trend charts.' },
+    { icon: <Lock size={28} />, title: 'Role-Based Access', desc: 'Patients, doctors, and admins each get a tailored, permission-controlled experience.' },
+    { icon: <QrCode size={28} />, title: 'Instant QR Access', desc: 'Share medical records instantly via secure QR codes in emergencies — zero paperwork.' },
+    { icon: <FileText size={28} />, title: 'Digital Prescriptions', desc: 'Doctors write, sign, and send structured prescriptions digitally. Full audit trail included.' },
+    { icon: <Users size={28} />, title: 'Multi-User Platform', desc: 'Seamlessly connect patients with healthcare providers in one unified, HIPAA-ready system.' },
 ];
 
 const howItWorks = [
-    {
-        step: '01',
-        title: 'Register & Verify',
-        desc: 'Patients, doctors, and admins sign up and get their role-specific account verified in minutes.',
-        color: '#00d4ff',
-    },
-    {
-        step: '02',
-        title: 'Scan or Access',
-        desc: 'Doctors scan a patient\'s QR code at the clinic to instantly pull their full medical history.',
-        color: '#7c3aed',
-    },
-    {
-        step: '03',
-        title: 'Prescribe & Store',
-        desc: 'Digital prescriptions are written, encrypted, and stored permanently in the patient\'s vault.',
-        color: '#059669',
-    },
+    { step: '01', title: 'Register & Verify', desc: 'Patients, doctors, and admins sign up and get their role-specific account verified in minutes.' },
+    { step: '02', title: 'Scan or Access', desc: 'Doctors scan a patient\'s QR code at the clinic to instantly pull their full medical history.' },
+    { step: '03', title: 'Prescribe & Store', desc: 'Digital prescriptions are written, encrypted, and stored permanently in the patient\'s vault.' },
 ];
 
 const testimonials = [
-    {
-        name: 'Dr. Priya Sharma',
-        role: 'General Physician, Apollo Hospitals',
-        text: 'MediVault has transformed how I manage patient records. The QR scan feature saves me 20 minutes per consultation and the digital prescription system is flawless.',
-        avatar: 'P',
-        color: '#7c3aed',
-        stars: 5,
-    },
-    {
-        name: 'Rahul Nair',
-        role: 'Patient, Bangalore',
-        text: 'Having all my medical history in one secure place and being able to share it instantly with any doctor via QR is a game changer. My entire family uses MediVault now.',
-        avatar: 'R',
-        color: '#00d4ff',
-        stars: 5,
-    },
-    {
-        name: 'Dr. Aisha Khan',
-        role: 'Cardiologist, AIIMS Delhi',
-        text: 'The dashboard is incredibly intuitive. I can view a patient\'s entire prescription history and vitals trends in seconds. This is truly the future of healthcare records.',
-        avatar: 'A',
-        color: '#059669',
-        stars: 5,
-    },
+    { name: 'Dr. Priya Sharma', role: 'General Physician, Apollo Hospitals', text: 'MediVault has transformed how I manage patient records. The QR scan feature saves me 20 minutes per consultation and the digital prescription system is flawless.', avatar: 'P', stars: 5 },
+    { name: 'Rahul Nair', role: 'Patient, Bangalore', text: 'Having all my medical history in one secure place and being able to share it instantly with any doctor via QR is a game changer. My entire family uses MediVault now.', avatar: 'R', stars: 5 },
+    { name: 'Dr. Aisha Khan', role: 'Cardiologist, AIIMS Delhi', text: 'The dashboard is incredibly intuitive. I can view a patient\'s entire prescription history and vitals trends in seconds. This is truly the future of healthcare records.', avatar: 'A', stars: 5 },
 ];
 
 const stats = [
@@ -101,7 +35,6 @@ const stats = [
 export default function LandingPage() {
     const { user, isLoggedIn } = useAuth();
     const navigate = useNavigate();
-    const heroRef = useRef(null);
     const [navScrolled, setNavScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -112,12 +45,7 @@ export default function LandingPage() {
     }, [isLoggedIn, user, navigate]);
 
     useEffect(() => {
-        const handleScroll = () => {
-            setNavScrolled(window.scrollY > 30);
-            if (heroRef.current) {
-                heroRef.current.style.transform = `translateY(${window.scrollY * 0.25}px)`;
-            }
-        };
+        const handleScroll = () => setNavScrolled(window.scrollY > 30);
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
@@ -128,7 +56,7 @@ export default function LandingPage() {
             <nav className={`landing-nav ${navScrolled ? 'scrolled' : ''}`}>
                 <div className="nav-container">
                     <Link to="/" className="nav-brand">
-                        <Shield size={22} color="#00d4ff" />
+                        <Shield size={22} style={{ color: 'var(--primary)' }} />
                         <span>MediVault</span>
                     </Link>
                     <div className={`nav-links ${mobileMenuOpen ? 'open' : ''}`}>
@@ -148,12 +76,7 @@ export default function LandingPage() {
 
             {/* ── HERO ── */}
             <section className="hero-section" id="home">
-                <div className="hero-bg" ref={heroRef} />
-                <div className="hero-particles">
-                    {[...Array(20)].map((_, i) => (
-                        <div key={i} className="particle" style={{ '--i': i }} />
-                    ))}
-                </div>
+                <div className="hero-bg" />
                 <div className="hero-content">
                     <div className="hero-badge">
                         <Shield size={14} />
@@ -201,8 +124,8 @@ export default function LandingPage() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="mockup-main">
-                                <div className="mockup-greeting">Welcome back, Rahul 👋</div>
+                                <div className="mockup-main">
+                                <div className="mockup-greeting">Welcome back, Rahul</div>
                                 <div className="mockup-cards-row">
                                     <div className="mockup-card blue"><div className="mockup-card-num">3</div><div className="mockup-card-label">Active Rx</div></div>
                                     <div className="mockup-card purple"><div className="mockup-card-num">12</div><div className="mockup-card-label">Records</div></div>
@@ -235,7 +158,7 @@ export default function LandingPage() {
                     <div className="features-grid">
                         {features.map((f) => (
                             <div key={f.title} className="feature-card">
-                                <div className="feature-icon" style={{ color: f.color, '--glow': f.color }}>
+                                <div className="feature-icon">
                                     {f.icon}
                                 </div>
                                 <h3 className="feature-title">{f.title}</h3>
@@ -257,7 +180,7 @@ export default function LandingPage() {
                     <div className="how-grid">
                         {howItWorks.map((h, idx) => (
                             <div key={h.step} className="how-card">
-                                <div className="how-step-num" style={{ color: h.color, borderColor: `${h.color}40` }}>{h.step}</div>
+                                <div className="how-step-num" style={{ color: 'var(--primary)', borderColor: 'rgba(13, 148, 136, 0.35)' }}>{h.step}</div>
                                 <h3 className="how-title">{h.title}</h3>
                                 <p className="how-desc">{h.desc}</p>
                                 {idx < howItWorks.length - 1 && (
@@ -280,13 +203,13 @@ export default function LandingPage() {
                         {testimonials.map((t) => (
                             <div key={t.name} className="testimonial-card">
                                 <div className="testimonial-stars">
-                                    {[...Array(t.stars)].map((_, i) => (
-                                        <Star key={i} size={14} fill="#f59e0b" color="#f59e0b" />
+                                {[...Array(t.stars)].map((_, i) => (
+                                    <Star key={i} size={14} fill="#d97706" color="#d97706" />
                                     ))}
                                 </div>
                                 <p className="testimonial-text">"{t.text}"</p>
                                 <div className="testimonial-author">
-                                    <div className="testimonial-avatar" style={{ background: `${t.color}22`, color: t.color }}>
+                                    <div className="testimonial-avatar" style={{ background: 'rgba(13, 148, 136, 0.12)', color: 'var(--primary)' }}>
                                         {t.avatar}
                                     </div>
                                     <div>
@@ -339,7 +262,7 @@ export default function LandingPage() {
                                 <div className="visual-ring ring-2" />
                                 <div className="visual-ring ring-3" />
                                 <div className="visual-center">
-                                    <Heart size={48} color="#00d4ff" />
+                                    <Heart size={48} style={{ color: 'var(--primary)' }} />
                                     <span>MediVault</span>
                                     <span className="visual-sub">Healthcare Platform</span>
                                 </div>
@@ -377,7 +300,7 @@ export default function LandingPage() {
                     <div className="footer-content">
                         <div className="footer-brand">
                             <div className="footer-logo">
-                                <Shield size={20} color="#00d4ff" />
+                                <Shield size={20} style={{ color: 'var(--primary-muted)' }} />
                                 <span className="gradient-text" style={{ fontSize: '1.3rem', fontWeight: 800 }}>MediVault</span>
                             </div>
                             <p>Securing health records for a better tomorrow.</p>
@@ -411,158 +334,12 @@ export default function LandingPage() {
                         </div>
                     </div>
                     <div className="footer-bottom">
-                        <p>© 2026 MediVault. All rights reserved. Built with ❤️ for better healthcare.</p>
+                        <p>© 2026 MediVault. All rights reserved. Built for better healthcare.</p>
                         <div className="footer-bottom-links">
                             <a href="#">Privacy</a>
                             <a href="#">Terms</a>
                             <a href="#">Cookies</a>
                         </div>
-                    </div>
-                </div>
-            </footer>
-        </div>
-    );
-}
-                    {[...Array(20)].map((_, i) => (
-                        <div key={i} className="particle" style={{ '--i': i }} />
-                    ))}
-                </div>
-                <div className="hero-content">
-                    <div className="hero-badge">
-                        <Shield size={14} />
-                        <span>HIPAA Compliant &amp; Secure</span>
-                    </div>
-                    <h1 className="hero-title">
-                        Your Health Records,
-                        <br />
-                        <span className="gradient-text">Secured &amp; Accessible</span>
-                    </h1>
-                    <p className="hero-subtitle">
-                        MediVault is the next-generation medical records platform that puts
-                        patients in control while empowering healthcare providers with the
-                        tools they need.
-                    </p>
-                    <div className="hero-actions">
-                        <Link to="/login" className="btn-primary-hero">
-                            Get Started Free
-                        </Link>
-                        <a href="#features" className="btn-secondary-hero">
-                            Explore Features
-                        </a>
-                    </div>
-                    <div className="hero-stats">
-                        {stats.map((s) => (
-                            <div key={s.label} className="hero-stat">
-                                <span className="stat-value">{s.value}</span>
-                                <span className="stat-label">{s.label}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                <div className="hero-scroll-indicator">
-                    <div className="scroll-dot" />
-                </div>
-            </section>
-
-            {/* Features Section */}
-            <section className="features-section" id="features">
-                <div className="section-container">
-                    <div className="section-header">
-                        <span className="section-tag">Why MediVault?</span>
-                        <h2 className="section-title">Everything You Need in One Place</h2>
-                        <p className="section-subtitle">
-                            A comprehensive platform built for the modern healthcare ecosystem.
-                        </p>
-                    </div>
-                    <div className="features-grid">
-                        {features.map((f) => (
-                            <div key={f.title} className="feature-card">
-                                <div className="feature-icon" style={{ color: f.color, '--glow': f.color }}>
-                                    {f.icon}
-                                </div>
-                                <h3 className="feature-title">{f.title}</h3>
-                                <p className="feature-desc">{f.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* About Section */}
-            <section className="about-section" id="about">
-                <div className="section-container">
-                    <div className="about-grid">
-                        <div className="about-content">
-                            <span className="section-tag">About MediVault</span>
-                            <h2 className="section-title">Built for the Future of Healthcare</h2>
-                            <p className="about-text">
-                                MediVault was founded with a singular mission: to make medical
-                                records universally accessible, secure, and interoperable. We
-                                believe every patient deserves control over their health data.
-                            </p>
-                            <p className="about-text">
-                                Our platform bridges the gap between patients, doctors, and
-                                administrators — creating a seamless ecosystem where health
-                                information flows securely and efficiently.
-                            </p>
-                            <div className="about-highlights">
-                                {['HIPAA Compliant', 'End-to-End Encrypted', 'Cloud-Native', 'Open Standards'].map((h) => (
-                                    <div key={h} className="highlight-chip">
-                                        <Shield size={14} />
-                                        {h}
-                                    </div>
-                                ))}
-                            </div>
-                            <Link to="/login" className="btn-primary-hero" style={{ display: 'inline-flex', marginTop: '2rem' }}>
-                                Join MediVault Today
-                            </Link>
-                        </div>
-                        <div className="about-visual">
-                            <div className="visual-card">
-                                <div className="visual-ring ring-1" />
-                                <div className="visual-ring ring-2" />
-                                <div className="visual-ring ring-3" />
-                                <div className="visual-center">
-                                    <Heart size={48} color="#00d4ff" />
-                                    <span>MediVault</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="cta-section">
-                <div className="section-container">
-                    <div className="cta-card">
-                        <h2 className="cta-title">Ready to Secure Your Health Data?</h2>
-                        <p className="cta-subtitle">
-                            Join thousands of patients and healthcare providers already using MediVault.
-                        </p>
-                        <Link to="/login" className="btn-primary-hero">
-                            Start for Free
-                        </Link>
-                    </div>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="landing-footer">
-                <div className="section-container">
-                    <div className="footer-content">
-                        <div className="footer-brand">
-                            <span className="gradient-text" style={{ fontSize: '1.5rem', fontWeight: 800 }}>MediVault</span>
-                            <p>Securing health records for a better tomorrow.</p>
-                        </div>
-                        <div className="footer-links">
-                            <a href="#features">Features</a>
-                            <a href="#about">About</a>
-                            <Link to="/login">Login</Link>
-                        </div>
-                    </div>
-                    <div className="footer-bottom">
-                        <p>© 2026 MediVault. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

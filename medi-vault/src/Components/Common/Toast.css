@@ -1,0 +1,68 @@
+/* Toast - works without Tailwind */
+.toast-root {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  max-width: 420px;
+  pointer-events: auto;
+}
+
+.toast-root.success {
+  background: rgba(5, 150, 105, 0.12);
+  border-color: rgba(5, 150, 105, 0.3);
+}
+
+.toast-root.success .toast-icon { color: #059669; }
+
+.toast-root.error {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.toast-root.error .toast-icon { color: #dc2626; }
+
+.toast-root.info {
+  background: rgba(13, 148, 136, 0.12);
+  border-color: rgba(13, 148, 136, 0.3);
+}
+
+.toast-root.info .toast-icon { color: var(--primary); }
+
+.toast-icon { flex-shrink: 0; }
+
+.toast-message { flex: 1; font-size: 0.9rem; font-weight: 500; }
+
+.toast-close {
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  border-radius: 6px;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.toast-close:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.dark .toast-close:hover { background: rgba(255, 255, 255, 0.08); }
+
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}

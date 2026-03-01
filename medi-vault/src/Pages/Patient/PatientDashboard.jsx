@@ -30,7 +30,14 @@ const NAV = [
 export default function PatientDashboard() {
     const { user, logout } = useAuth();
     const dataCtx = useData();
-    const { getPatientByUserId, getPrescriptionsForPatient, getDocumentsForPatient, addDocument } = dataCtx;
+    // eslint-disable-next-line no-unused-vars
+    const {
+        getPatientByUserId,
+        getPrescriptionsForPatient,
+        getDocumentsForPatient,
+        addDocument,
+        getAppointmentsForPatient,
+    } = dataCtx;
     const useDataRef = useRef(dataCtx);
     useEffect(() => { useDataRef.current = dataCtx; }, [dataCtx]);
     const navigate = useNavigate();
@@ -49,6 +56,7 @@ export default function PatientDashboard() {
     const [patient, setPatient] = useState({});
     const [prescriptions, setPrescriptions] = useState([]);
     const [documents, setDocuments] = useState([]);
+    const [appointments, setAppointments] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
     // Reset search when tab changes
@@ -72,13 +80,15 @@ export default function PatientDashboard() {
                     const p = await getPatientByUserId(user.id);
                     if (mounted && p) {
                         setPatient(p);
-                        const [rxList, docList] = await Promise.all([
+                        const [rxList, docList, apptList] = await Promise.all([
                             getPrescriptionsForPatient(p.id),
-                            getDocumentsForPatient(p.id)
+                            getDocumentsForPatient(p.id),
+                            getAppointmentsForPatient(p.id),
                         ]);
                         if (mounted) {
                             setPrescriptions(rxList || []);
                             setDocuments(docList || []);
+                            setAppointments(apptList || []);
                         }
                     }
                 } catch (err) {
@@ -94,6 +104,9 @@ export default function PatientDashboard() {
     }, [user, getPatientByUserId, getPrescriptionsForPatient, getDocumentsForPatient]);
 
     const activeRx = prescriptions.filter((r) => r.status === 'active');
+    const upcomingAppointments = (Array.isArray(appointments) ? appointments : [])
+        .filter(a => a.startTime && new Date(a.startTime) >= new Date())
+        .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     const qrValue = JSON.stringify({ patientId: patient.id, name: patient.name, v: 1 });
 
     const handleLogout = () => { logout(); navigate('/', { replace: true }); };
@@ -190,8 +203,8 @@ export default function PatientDashboard() {
         win.document.write(`<html><head><title>Prescription - ${selectedRx?.id}</title>
       <style>
         body { font-family: Arial, sans-serif; padding: 20px; color: #000; }
-        .rx-header { border-bottom: 2px solid #0099cc; padding-bottom: 12px; margin-bottom: 16px; }
-        .rx-header h1 { color: #0099cc; font-size: 22px; }
+        .rx-header { border-bottom: 2px solid #0d9488; padding-bottom: 12px; margin-bottom: 16px; }
+        .rx-header h1 { color: #0d9488; font-size: 22px; }
         .rx-header p { font-size: 12px; color: #555; }
         .rx-section { margin-bottom: 14px; }
         .rx-section h3 { font-size: 13px; color: #0099cc; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 8px; }
@@ -214,7 +227,7 @@ export default function PatientDashboard() {
             {/* Sidebar */}
             <aside className={`pd-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="pd-sidebar-brand">
-                    <img src="/logo.png" alt="MediVault" style={{ height: '32px', width: 'auto' }} />
+                    <img src="/logo.png" alt="MediVault" loading="lazy" style={{ height: '32px', width: 'auto' }} />
                     <span style={{ marginLeft: '8px' }}>MediVault</span>
                 </div>
 
@@ -273,7 +286,7 @@ export default function PatientDashboard() {
                         <div className="pd-tab">
                             <div className="pd-welcome">
                                 <div>
-                                    <h2>Welcome back, {patient.name?.split(' ')[0]} 👋</h2>
+                                    <h2>Welcome back, {patient.name?.split(' ')[0]}</h2>
                                     <p>Your health vault is secure and up to date.</p>
                                 </div>
                                 <div className="pd-welcome-date">
@@ -285,10 +298,11 @@ export default function PatientDashboard() {
                             {/* Quick stats */}
                             <div className="pd-stats-row">
                                 {[
-                                    { label: 'Active Prescriptions', value: activeRx.length, icon: Pill, color: '#00d4ff' },
-                                    { label: 'Total Records', value: documents.length, icon: FileText, color: '#7c3aed' },
-                                    { label: 'Past Prescriptions', value: prescriptions.filter(r => r.status === 'completed').length, icon: CheckCircle, color: '#10b981' },
-                                    { label: 'Allergies on File', value: patient.allergies?.length || 0, icon: AlertTriangle, color: '#f59e0b' },
+                                    { label: 'Active Prescriptions', value: activeRx.length, icon: Pill, color: 'var(--primary)' },
+                                    { label: 'Total Records', value: documents.length, icon: FileText, color: '#1e40af' },
+                                    { label: 'Upcoming Appointments', value: upcomingAppointments.length, icon: Calendar, color: '#0d9488' },
+                                    { label: 'Past Prescriptions', value: prescriptions.filter(r => r.status === 'completed').length, icon: CheckCircle, color: '#059669' },
+                                    { label: 'Allergies on File', value: patient.allergies?.length || 0, icon: AlertTriangle, color: '#d97706' },
                                 ].map(({ label, value, icon: Icon, color }) => (
                                     <div key={label} className="pd-stat-card">
                                         <div className="pd-stat-icon" style={{ color }}><Icon size={20} /></div>
@@ -309,6 +323,39 @@ export default function PatientDashboard() {
                                 {loading ? <Skeleton height="380px" className="rounded-xl" /> : <VitalsChart vitalsData={vitals} onAddVital={handleAddVital} />}
                             </div>
 
+                            {/* Upcoming appointment & Active prescriptions */}
+                            {upcomingAppointments.length > 0 && (
+                                <div className="pd-two-col" style={{ marginTop: '1.5rem' }}>
+                                    <div className="pd-info-card">
+                                        <h3><Calendar size={15} /> Next Appointment</h3>
+                                        <p className="pd-empty-text">
+                                            {new Date(upcomingAppointments[0].startTime).toLocaleString('en-IN')}
+                                            {upcomingAppointments[0].doctorName && ` · with Dr. ${upcomingAppointments[0].doctorName}`}
+                                        </p>
+                                        {upcomingAppointments[0].reason && (
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                                                {upcomingAppointments[0].reason}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="pd-info-card">
+                                        <h3><Calendar size={15} /> All Appointments</h3>
+                                        {appointments.length === 0 && (
+                                            <p className="pd-empty-text">No appointments scheduled yet.</p>
+                                        )}
+                                        {appointments.slice(0, 3).map(a => (
+                                            <div key={a.id} style={{ fontSize: '0.8rem', marginBottom: '4px' }}>
+                                                <span style={{ fontWeight: 600 }}>
+                                                    {new Date(a.startTime).toLocaleString('en-IN')}
+                                                </span>
+                                                {a.doctorName && ` · Dr. ${a.doctorName}`}
+                                                {a.status && ` · ${a.status}`}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Active prescriptions preview */}
                             {(activeRx.length > 0 || loading) && (
                                 <>
@@ -327,7 +374,7 @@ export default function PatientDashboard() {
                                         ) : (
                                             activeRx.slice(0, 3).map((rx) => (
                                                 <div key={rx.id} className="pd-rx-card" onClick={() => { setSelectedRx(rx); setActiveTab('prescriptions'); }}>
-                                                    <div className="pd-rx-icon"><Pill size={20} color="#00d4ff" /></div>
+                                                    <div className="pd-rx-icon"><Pill size={20} style={{ color: 'var(--primary)' }} /></div>
                                                     <div className="pd-rx-info">
                                                         <p className="pd-rx-title">{rx.diagnosis}</p>
                                                         <p className="pd-rx-meta">{rx.doctorName} · {new Date(rx.issuedAt).toLocaleDateString('en-IN')}</p>
@@ -388,7 +435,7 @@ export default function PatientDashboard() {
                                 <div className="pd-vault-qr-wrap">
                                     <div className="pd-qr-card">
                                         <div className="pd-qr-header">
-                                            <Shield size={16} color="#00d4ff" />
+                                            <Shield size={16} style={{ color: 'var(--primary)' }} />
                                             <span>MediVault Secure ID</span>
                                         </div>
                                         <div className="pd-qr-box">
@@ -396,7 +443,7 @@ export default function PatientDashboard() {
                                                 value={qrValue}
                                                 size={200}
                                                 bgColor="transparent"
-                                                fgColor="#00d4ff"
+                                                fgColor="#0d9488"
                                                 level="H"
                                             />
                                         </div>
@@ -428,7 +475,7 @@ export default function PatientDashboard() {
                             <div className="pd-rx-list">
                                 {prescriptions.slice(0, 5).map((rx) => (
                                     <div key={rx.id} className="pd-rx-card">
-                                        <div className="pd-rx-icon"><FileText size={20} color="#7c3aed" /></div>
+                                        <div className="pd-rx-icon"><FileText size={20} style={{ color: '#1e40af' }} /></div>
                                         <div className="pd-rx-info">
                                             <p className="pd-rx-title">Prescription by {rx.doctorName}</p>
                                             <p className="pd-rx-meta">{rx.diagnosis} · {new Date(rx.issuedAt).toLocaleString('en-IN')}</p>
@@ -455,7 +502,7 @@ export default function PatientDashboard() {
                                         {filteredRx.length === 0 && <EmptyState title="No prescriptions found" description="Try adjusting your search criteria" />}
                                         {filteredRx.map((rx) => (
                                             <div key={rx.id} className="pd-rx-card clickable" onClick={() => setSelectedRx(rx)}>
-                                                <div className="pd-rx-icon"><Pill size={20} color="#00d4ff" /></div>
+                                                <div className="pd-rx-icon"><Pill size={20} style={{ color: 'var(--primary)' }} /></div>
                                                 <div className="pd-rx-info">
                                                     <p className="pd-rx-title">{rx.diagnosis}</p>
                                                     <p className="pd-rx-meta">{rx.doctorName} · {rx.doctorSpecialty}</p>
@@ -502,7 +549,7 @@ export default function PatientDashboard() {
                                                 onDragLeave={() => setDragOver(false)}
                                                 onDrop={handleDrop}
                                             >
-                                                <FileUp size={24} color="#00d4ff" />
+                                                <FileUp size={24} style={{ color: 'var(--primary)' }} />
                                                 <p>Drag &amp; drop a file here</p>
                                                 <span>or fill in the details below</span>
                                             </div>
@@ -540,7 +587,7 @@ export default function PatientDashboard() {
                                 {filteredDocs.length === 0 && <EmptyState title="No documents found" description="Try adjusting your search or upload a new one" />}
                                 {filteredDocs.map((doc) => (
                                     <div key={doc.id} className="pd-doc-card">
-                                        <div className="pd-doc-icon"><FileText size={22} color="#00d4ff" /></div>
+                                        <div className="pd-doc-icon"><FileText size={22} style={{ color: 'var(--primary)' }} /></div>
                                         <div className="pd-doc-info">
                                             <p className="pd-doc-name">{doc.name}</p>
                                             <p className="pd-doc-meta">{doc.type} · Uploaded by {doc.uploadedBy}</p>
@@ -634,7 +681,7 @@ function PrescriptionViewer({ rx, onClose, printRef, onPrint }) {
                 <div className="rx-letterhead">
                     <div className="rx-lh-left">
                         <div className="rx-lh-logo">
-                            <img src="/logo.png" alt="MediVault" style={{ height: '36px', width: 'auto', marginRight: '8px' }} />
+                            <img src="/logo.png" alt="MediVault" loading="lazy" style={{ height: '36px', width: 'auto', marginRight: '8px' }} />
                             <span>MediVault</span>
                         </div>
                         <p className="rx-lh-hospital">{rx.doctorHospital}</p>

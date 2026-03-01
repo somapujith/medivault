@@ -7,13 +7,18 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
     if (loading) {
         return (
-            <div style={{ minHeight: '100vh', background: '#f0f4f8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div
+                style={{ minHeight: '100vh', background: '#f0f4f8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                role="status"
+                aria-live="polite"
+                aria-busy="true"
+            >
                 <div style={{
                     width: '50px',
                     height: '50px',
                     border: '3px solid rgba(0,0,0,0.1)',
                     borderRadius: '50%',
-                    borderTopColor: '#00d4ff',
+                    borderTopColor: '#0d9488',
                     animation: 'spin 1s ease-in-out infinite'
                 }} />
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
